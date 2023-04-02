@@ -44,8 +44,8 @@ int main(void)
 	init();
 
 	// stdio_printf("HELLO THERE! Running at %dMHz\n", MAP_SysCtlClockGet());
-	stdio_print("Hello = ");
-	stdio_printHex("Hello = ", sizeof("Hello = "));
+	stdio_print("Hex dump:\n");
+	stdio_hexdump("\x1b[8A", sizeof("\x1b[8A"));
 
 	shell_task();
 

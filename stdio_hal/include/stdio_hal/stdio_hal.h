@@ -15,5 +15,6 @@ size_t 	stdio_print(const char* s);
 void	stdio_printf(const char *pcString, ...);
 
 void stdio_printHex(const char* s, size_t len);
+void stdio_hexdump(const void* data, size_t len);
 
 #endif // !STDIO_HAL_H_
