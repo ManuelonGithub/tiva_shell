@@ -43,7 +43,11 @@ int main(void)
 {
 	init();
 
-	// stdio_printf("HELLO THERE! Running at %dMHz\n", MAP_SysCtlClockGet());
+	// stdio_print("Hex dump:\n");
+	// stdio_hexdump("\0Well Hello There :)\nHow\'s it going?\n\nI am doing very well thank you!", 
+	// 	sizeof("\0Well Hello There :)\nHow\'s it going?\n\nI am doing very well thank you!"));
+
+
 	stdio_print("Hex dump:\n");
 	stdio_hexdump("\x1b[8A", sizeof("\x1b[8A"));
 

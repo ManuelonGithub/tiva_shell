@@ -100,69 +100,38 @@ void stdio_printHex(const char* s, size_t len)
 	}
 }
 
-void stdio_hexdump(const void* data, size_t len)
+static void format_hexdump_line(const char* data_snip, char* hex_snip, char* ascii_snip, size_t len)
 {
-	// dontains both the hex and ascii snippet
-	// requires: 	3*16 bytes + 
-	//				2 bytes for the seperator + 
-	//				16 bytes for the ascii snippet + 
-	//				2 bytes for newline and null-termination
-	// = 68 bytes
-	char dump_line[68];
+    for (size_t i = 0; i < len; i++) {
+        hex_snip[i*3] = hex_lut[(data_snip[i] >> 4) & 0x0f];
+        hex_snip[i*3+1] = hex_lut[data_snip[i] & 0x0f];
+        hex_snip[i*3+2] = ' ';
+        ascii_snip[i] = (data_snip[i] > 31 && data_snip[i] < 127) ? data_snip[i] : '.';
+    }
+}
 
-	dump_line[66] = '\n';
-	dump_line[67] = '\0';
+void stdio_hexdump(const char* data, size_t len)
+{
+    char hex_snip[3 * 16 + 1] = {0};
+    char ascii_snip[16 + 1] = {0};
 
-	dump_line[48] = '|';
-	dump_line[49] = ' ';
+	const size_t hex_lines = len >> 4;
+    const size_t leftover = len & 0x0f;
 
-	char* ascii_snip = dump_line+50;
+    for (size_t i = 0; i < hex_lines; i++) {
+        const char* data_snip = data + (i << 4);
+        format_hexdump_line(data_snip, hex_snip, ascii_snip, 16);
+        stdio_printf("0x%03x0: %s | %s\n", i, hex_snip, ascii_snip);
+    }
 
-	size_t hex_lines = len >> 4;
-	size_t leftover = len & 0x0F;
+    if (leftover) {
+        const char* data_snip = data + (hex_lines << 4);
+        format_hexdump_line(data_snip, hex_snip, ascii_snip, leftover);
 
-	for (size_t i = 0; i < hex_lines; i++) {
-		char* data_snip = (char*)(data+(i << 4));
-		for (size_t j = 0; j < 16; j++) {
-			size_t line_idx = j*3;
-
-			if (data_snip[j] > 31 && data_snip[j] < 127) {
-				ascii_snip[j] = data_snip[j];
-			}
-			else {
-				ascii_snip[j] = '.';
-			}
-
-			dump_line[line_idx] = hex_lut[(data_snip[j] >> 4)];
-			dump_line[line_idx+1] = hex_lut[(data_snip[j] & 0x0f)];
-			dump_line[line_idx+2] = ' ';
+		if (hex_lines) {
+        	memset(hex_snip + leftover * 3, ' ', (16 - leftover) * 3);
 		}
-
-		stdio_printf("0x%03x0: %s", i, dump_line);
-	}
-
-	if (leftover) {
-		char* data_snip = (char*)(data+(hex_lines << 4));
-		size_t blanks = 16-leftover;
-		ascii_snip[leftover] = '\n';
-		ascii_snip[leftover+1] = '\0';
-
-		for (size_t i = 0; i < leftover; i++) {
-			size_t line_idx = i*3;
-
-			if (data_snip[i] > 31 && data_snip[i] < 127) {
-				ascii_snip[i] = data_snip[i];
-			}
-			else {
-				ascii_snip[i] = '.';
-			}
-
-			dump_line[line_idx] = hex_lut[(data_snip[i] >> 4)];
-			dump_line[line_idx+1] = hex_lut[(data_snip[i] & 0x0f)];
-			dump_line[line_idx+2] = ' ';
-		}
-
-		memset(dump_line+(leftover*3), 0x20, blanks*3);
-		stdio_printf("0x%03x0: %s", hex_lines+1, dump_line);
-	}
+		
+        stdio_printf("0x%03x0: %s | %s\n", hex_lines, hex_snip, ascii_snip);
+    }
 }
