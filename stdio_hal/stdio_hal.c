@@ -32,7 +32,7 @@
 	static const char hex_lut[] = "0123456789abcdef";
 #endif // STDIO_BIG_HEX
 
-stdio_code_t stdio_init()
+int stdio_init()
 {
 	// Enable UART peripheral & the GPIO Peripheral where the uart pinout is connected
 	MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
@@ -84,17 +84,9 @@ void stdio_printf(const char *pcString, ...)
 {
 	va_list vaArgP;
 
-	//
-	// Start the varargs processing.
-	//
-	va_start(vaArgP, pcString);
-
+	va_start(vaArgP, pcString); // Start the varargs processing.
 	UARTvprintf(pcString, vaArgP);
-
-	//
-	// We're finished with the varargs now.
-	//
-	va_end(vaArgP);
+	va_end(vaArgP); // We're finished with the varargs now.
 }
 
 void stdio_printHex(const char* s, size_t len)

@@ -3,9 +3,9 @@
 
 #include <string.h>
 
-typedef enum {STDIO_OK, STDIO_ERR} stdio_code_t;
+enum STDIO_ERR_CODES {STDIO_OK, STDIO_ERR};
 
-stdio_code_t	stdio_init();
+int		stdio_init();
 
 char 	stdio_getc();
 
