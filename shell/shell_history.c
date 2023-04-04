@@ -104,7 +104,6 @@ void add_shell_cmd(const char* cmd)
          *      5. Get the length of the command
          *  So we iterate through the cmd "manually" so all these checks&operations are performed in one go!
          */
-        // WHY ARE YOU NOT STOPPING ONCE "SAME_AS_PREV_CMD" IS FALSE?
         while (cmd[len] != '\0') {
             // keep track whether or not current command is the same as the newest cmd in history
             if (same_as_prev_cmd && (cmd[len] != prev_cmd[len])) {
