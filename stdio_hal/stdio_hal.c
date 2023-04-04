@@ -57,9 +57,11 @@ void stdio_putc(char c)
 	MAP_UARTCharPut(UART0_BASE, c);
 }
 
-size_t stdio_put(const char* buf, size_t len)
+void stdio_put(const char* buf, size_t len)
 {
-	return UARTwrite(buf, len);
+	for (size_t i = 0; i < len; i++) {
+		stdio_putc(buf[i]);
+	}
 }
 
 size_t stdio_print(const char* s)
@@ -67,6 +69,10 @@ size_t stdio_print(const char* s)
 	int i = 0;
 
 	while (s[i] != '\0') {
+		if (s[i] == '\n') {
+			stdio_putc('\r');
+		}
+
 		stdio_putc(s[i]);
 		i++;
 	}
