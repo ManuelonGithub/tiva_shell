@@ -5,7 +5,7 @@
 
 // I just have so many private static function prototypes ...
 // so I decided to add them here where I can properly document then
-// without making the readline file gigantic
+// without making the shell_readline file gigantic
 
 /**
  * @brief 	Entry function for input character processing
@@ -40,15 +40,17 @@ static void cursor_lmove(unsigned int cnt);
 /// @param cnt 	amount of spaces to move
 static void cursor_rmove(unsigned int cnt);
 
+static void cursor_autocomplete();
+
+/// @brief 		Clears the the current line and sets it to cmd
+/// @param 	cmd text to the set the line to after it's been cleared
+static void cursor_line_reset(const char* cmd);
+
 /// @brief iterate up the saved command history
 static void history_move_up();
 
 /// @brief iterate down the saved command history
 static void history_move_down();
-
-/// @brief 		Clears the the current line and sets it to cmd
-/// @param 	cmd text to the set the line to after it's been cleared
-static void cursor_line_reset(const char* cmd);
 
 /// @brief combines the text on either side of the cursor and null-terminates the command
 static void cmd_null_terminate();

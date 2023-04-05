@@ -6,6 +6,7 @@ add_library(stdio_hal)
 # setting a variable src_files will all .cpp files in the lib
 set(src_files 
 	${CMAKE_CURRENT_LIST_DIR}/stdio_hal.c
+	${CMAKE_CURRENT_LIST_DIR}/stdio_hal_extension.c
 	$ENV{TIVAWARE_PATH}/utils/uartstdio.c
 	# more files would go here
 )
@@ -13,6 +14,7 @@ set(src_files
 # setting a variable in_files will all .h files in the lib
 set(inc_files 
 	${CMAKE_CURRENT_LIST_DIR}/include/stdio_hal/stdio_hal.h
+	${CMAKE_CURRENT_LIST_DIR}/include/stdio_hal/stdio_hal_extension.h
 	# more files would go here
 )
 

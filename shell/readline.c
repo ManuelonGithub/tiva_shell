@@ -35,13 +35,13 @@ static readline_ctx_t ctx;
 /**************************************************************************************************/
 /**************************************************************************************************/
 
-/// @brief initializes the history index of the readline context
+/// @brief initializes the history index of the shell_readline context
 static inline void history_idx_init()
 {
 	ctx.hist_idx = -1;
 }
 
-/// @brief initializes the readline context
+/// @brief initializes the shell_readline context
 void readline_init()
 {
     // State variable to track escape codes
@@ -58,18 +58,15 @@ void readline_init()
 /**************************************************************************************************/
 /**************************************************************************************************/
 
-// readline function body
+// shell_readline function body
 
-const char* cmd_prompt = ">>";
-
-char* readline()
+char* shell_readline()
 {
-	readline_init();
-	stdio_printf("\n%s ", cmd_prompt);
+	stdio_printf("\n%s", shell_line_prompt);
 
+	readline_init();
 	// Loop forever echoing data through the UART.
     while(!process_char(stdio_getc())) {}
-	
 	return ctx.cmdBuf;
 }
 
@@ -85,7 +82,7 @@ static inline char* cmd_rhs()
 /// @brief checks if there is space available in the buffer
 static inline bool cmd_space_avail()
 {
-    return (ctx.lhsCnt+ctx.rhsCnt) <= CMD_MAX_LEN;
+    return (ctx.lhsCnt+ctx.rhsCnt) < CMD_MAX_LEN;
 }
 
 /// @brief checks the context if history is currently being iterated through
@@ -152,6 +149,10 @@ static bool process_char(char c)
 				cursor_backspace();
 				break;
 
+			case '\t':
+				cursor_autocomplete();
+				break;
+
 			case 0x7F:	// ctrl+BS
 				cursor_delete();
 				break;
@@ -175,22 +176,40 @@ static bool process_char(char c)
 
 static void handle_esc_code(char attr, char code)
 {
+	// https://en.wikipedia.org/wiki/ANSI_escape_code#Terminal_input_sequences
     switch (code) {
-    case 'A':
+    case 'A':	// up arrow
         history_move_up();
         break;
-
-    case 'B':
+    case 'B':	// down arrow
         history_move_down();
         break;
-
-    case 'C':
+    case 'C':	// right arrow
 		cursor_rmove(1);
         break;
-
-    case 'D':
+    case 'D':	// left arrow
         cursor_lmove(1);
         break;
+	case 'F':	// end key
+		cursor_rmove(ctx.rhsCnt);
+		break;
+	case 'H':	// home key
+		cursor_lmove(ctx.lhsCnt);
+		break;
+	case '~':
+		if (attr == '1' || attr == '7') { // end key
+			cursor_lmove(ctx.lhsCnt);
+		}
+		else if (attr == '3') {	// delete key
+			if (browsing_history()) {
+				transfer_hist_cmd();
+			}
+			cursor_delete();
+		}
+		else if (attr == '4' || attr == '8') { // home key
+			cursor_rmove(ctx.rhsCnt);
+		}
+		break;
     }
 }
 
@@ -277,6 +296,44 @@ static void cursor_rmove(unsigned int cnt)
 	}
 }
 
+static void cursor_autocomplete()
+{
+	if (ctx.lhsCnt) {
+		ctx.cmdBuf[ctx.lhsCnt] = '\0';
+
+		const char* cmpl_cmd = NULL;
+		size_t ret = find_or_print_matches(ctx.cmdBuf, ctx.lhsCnt, &cmpl_cmd);
+		
+		if (ret < SIZE_MAX) {
+			if (cmpl_cmd) {
+				// only one match 
+				vt100_clear_from_cursor();
+				ctx.rhsCnt = 0;
+				size_t n = stdio_print(cmpl_cmd+ctx.lhsCnt);
+				memcpy(ctx.cmdBuf+ctx.lhsCnt, cmpl_cmd+ctx.lhsCnt, n);
+				ctx.lhsCnt += n;
+			}
+			else {
+				// multiple matches - need to reset prompt
+				stdio_printf("\n%s%s", shell_line_prompt, ctx.cmdBuf);
+				if (ctx.rhsCnt) {
+					stdio_put(cmd_rhs(), ctx.rhsCnt);
+					vt100_cursor_lmove(ctx.rhsCnt);
+				}
+			}
+		}
+	}
+}
+
+static void cursor_line_reset(const char* cmd)
+{
+    vt100_cursor_lmove(ctx.lhsCnt);
+    vt100_clear_from_cursor();
+
+    ctx.lhsCnt = stdio_print(cmd);
+    ctx.rhsCnt = 0;
+}
+
 static void history_move_up()
 {
 	if (!((ctx.hist_idx + 1) == get_hist_saved_count())) {	// check if there's history to iterate
@@ -305,21 +362,14 @@ static void history_move_down()
 	}
 }
 
-static void cursor_line_reset(const char* cmd)
-{
-    vt100_cursor_lmove(ctx.lhsCnt);
-    vt100_clear_from_cursor();
-
-    ctx.lhsCnt = stdio_print(cmd);
-    ctx.rhsCnt = 0;
-}
-
 static void cmd_null_terminate()
 {
-	// the very last character in the cmd_buffer has been set to 0
-	// so rhsCnt+1 will then include the null-terminator
-	memcpy(ctx.cmdBuf+ctx.lhsCnt, cmd_rhs(), ctx.rhsCnt);
-
+	if ((ctx.lhsCnt+ctx.rhsCnt) > CMD_MAX_LEN-ctx.rhsCnt) {
+		memmove(ctx.cmdBuf+ctx.lhsCnt, cmd_rhs(), ctx.rhsCnt);
+	}
+	else {
+		memcpy(ctx.cmdBuf+ctx.lhsCnt, cmd_rhs(), ctx.rhsCnt);
+	}
     // move lhsCnt to be +cmdRhs chars forward & "reset" cmdRhs
     ctx.lhsCnt += ctx.rhsCnt;
     ctx.rhsCnt = 0;
@@ -335,7 +385,7 @@ static void transfer_hist_cmd()
     memcpy(ctx.cmdBuf, cmd, ctx.lhsCnt);
     memcpy(cmd_rhs(), cmd+ctx.lhsCnt, ctx.rhsCnt);
 
-	history_ctx_init();
+	history_idx_init();
 }
 
 /**************************************************************************************************/

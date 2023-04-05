@@ -17,6 +17,7 @@
 #include "driverlib/rom_map.h"
 
 #include "stdio_hal/stdio_hal.h"
+#include "stdio_hal/stdio_hal_extension.h"
 #include "shell/shell.h"
 
 // #define CLK_80M
@@ -38,7 +39,6 @@ void init()
 	stdio_init();
 }
 
-
 int main(void)
 {
 	init();
@@ -49,6 +49,19 @@ int main(void)
 	{
 	}
 }
+
+void say_hello(int argc, char** argv)
+{
+	stdio_print("HELLO :D!\n");
+}
+
+void say_goodbye(int argc, char** argv)
+{
+	stdio_print("Goodbye :(...\n");
+}
+
+REGISTER_CMD("hello", say_hello, "says hello");
+REGISTER_CMD("goodbye", say_goodbye, "says goodbye");
 
 
 // The error routine that is called if the driver library encounters an error.

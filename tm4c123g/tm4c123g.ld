@@ -41,11 +41,6 @@ SECTIONS
         *(.init*)
         *(.fini*)
 
-        /* . = ALIGN(8);
-        _data_table = .;
-        KEEP(*(SORT(.data_table*)))
-        _edata_table = .; */
-
         *(.rodata*)
         _etext = .;
     } > FLASH
@@ -55,6 +50,11 @@ SECTIONS
         _data = .;
         *(vtable)
         *(.data*)
+
+        _shell_cmds = .;
+        KEEP(*(SORT(.shell_cmd*)))
+        _eshell_cmds = .;
+
         _edata = .;
     } > SRAM
 
