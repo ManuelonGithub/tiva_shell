@@ -6,8 +6,6 @@
 #include "shell_cfg.h"
 #include "shell_history.h"
 
-#define MAX_CMDS 5
-
 typedef struct {
     char buf[CMD_HIST_BUF];
     size_t wrPtr;
@@ -51,14 +49,14 @@ static int check_new_cmd_len_collides(size_t len)
 }
 
 
-void shell_hist_init()
+void hist_init()
 {
     ctx.wrPtr = 0;
     ctx.oldestIdx = 0;
     ctx.nextIdx = 0;
 }
 
-unsigned int get_hist_saved_count()
+unsigned int hist_count()
 {
     if (ctx.oldestIdx > ctx.nextIdx) {
         return ctx.nextIdx + (MAX_CMDS-ctx.oldestIdx);
@@ -68,21 +66,21 @@ unsigned int get_hist_saved_count()
     }
 }
 
-const char* get_shell_hist_cmd(unsigned int offset)
+const char* hist_cmd_by_offset(unsigned int offset)
 {
     // don't event try if the offset is out-of-bounds
-    if (offset >= get_hist_saved_count()) {
+    if (offset >= hist_count()) {
         return NULL;
     }
 
     return ctx.buf+hist_offset_to_index(offset);
 }
 
-void add_shell_cmd(const char* cmd)
+void hist_add_entry(const char* cmd)
 {
     bool same_as_prev_cmd = true;
 
-    const char* prev_cmd = get_shell_hist_cmd(0);
+    const char* prev_cmd = hist_cmd_by_offset(0);
 
     bool can_pre_write = true;
     size_t pre_write_cnt = 0;

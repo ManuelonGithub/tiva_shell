@@ -10,11 +10,11 @@
 	static const char hex_lut[] = "0123456789abcdef";
 #endif // STDIO_BIG_HEX
 
-void stdio_printHex(const char* s, unsigned int len)
+void stdio_printHex(const char* buf, unsigned int len)
 {
 	for (size_t i = 0; i < len; i++) {
-		stdio_putc(hex_lut[(s[i] >> 4)]);
-		stdio_putc(hex_lut[(s[i] & 0x0f)]);
+		stdio_putc(hex_lut[(buf[i] >> 4)]);
+		stdio_putc(hex_lut[(buf[i] & 0x0f)]);
 		stdio_putc(' ');
 	}
 }
@@ -107,37 +107,4 @@ unsigned int hex_to_arr(const char* hexstr, char* dst, size_t len)
 	}
 
 	return i;
-}
-
-unsigned int hex_to_val(const char* hexstr)
-{
-	unsigned int val = 0;
-
-	int nibs = 0, i = 0;
-
-	char c = hexstr[i];
-
-	while (c != 0 && nibs < 8) {
-		if (c != ' ') {
-			if ('0' <= c && c <= '9') {
-				c = (c - '0');
-			}
-			else {
-				c = my_toupper(c);
-				if ('A' <= c && c <= 'F') {
-					c = (c - ('A' - 10));
-				}
-				else {
-					break;
-				}
-			}
-
-			val = (val << 4) | c;
-			
-			nibs++;
-		}
-		c = hexstr[++i];
-	}
-
-	return val;
 }

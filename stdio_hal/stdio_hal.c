@@ -26,7 +26,7 @@
 
 #include "utils/uartstdio.h"
 
-int stdio_init()
+void stdio_init()
 {
 	// Enable UART peripheral & the GPIO Peripheral where the uart pinout is connected
 	MAP_SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
@@ -37,8 +37,6 @@ int stdio_init()
 
 	// Configure the UART with the inputed speed + 8-N-1 operation.
 	UARTStdioConfig(0, STDIO_BAUD, MAP_SysCtlClockGet());
-
-    return STDIO_OK;
 }
 
 char stdio_getc()

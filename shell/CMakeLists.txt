@@ -9,7 +9,7 @@ add_library(${LIBRARY_NAME})
 set(src_files 
 	${CMAKE_CURRENT_LIST_DIR}/shell.c
 	${CMAKE_CURRENT_LIST_DIR}/shell_history.c
-	${CMAKE_CURRENT_LIST_DIR}/readline.c
+	${CMAKE_CURRENT_LIST_DIR}/shell_readline.c
 	# more files would go here
 )
 
@@ -21,8 +21,8 @@ set(inc_files
 )
 
 set(prv_inc_files
-	${CMAKE_CURRENT_LIST_DIR}/include/prv/readline.h
-	${CMAKE_CURRENT_LIST_DIR}/include/prv/readline_prv.h
+	${CMAKE_CURRENT_LIST_DIR}/include/prv/shell_readline.h
+	${CMAKE_CURRENT_LIST_DIR}/include/prv/shell_readline_prv.h
 	${CMAKE_CURRENT_LIST_DIR}/include/prv/shell_history.h
 )
 

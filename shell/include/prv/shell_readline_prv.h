@@ -18,7 +18,7 @@ static bool process_char(char c);
  * @brief 	Performs the actions related to a escape code + attribute
  * @param 	attr escape code attribute
  * @param 	code escape code
- * @details	escape code: x1b[<attr><code>
+ * @note	escape code: x1b[<attr><code>
  */
 static void handle_esc_code(char attr, char code);
 
@@ -59,7 +59,7 @@ static void cmd_null_terminate();
 static void transfer_hist_cmd();
 
 /// @brief VT100 command to erase all chars to the right of the cursor
-static void vt100_clear_from_cursor();
+static inline void vt100_clear_from_cursor();
 
 /// @brief 	   VT100 command to move the cursor left 
 /// @param cnt amount of the times to move the cursor
