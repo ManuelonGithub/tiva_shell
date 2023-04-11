@@ -22,14 +22,14 @@ find_program(CMAKE_OBJDUMP ${TOOLCHAIN_PREFIX}-objdump REQUIRED)
 enable_language(ASM)
 
 # Set Compile Flags - don't override cache though
-set(CPU "-mcpu=cortex-m4" CACHE STRING "CPU Compile target flag")
-set(FPU "-mfpu=fpv4-sp-d16 -mfloat-abi=hard" CACHE STRING "Floating Point support flags")
-set(Oxx "-Os -ffunction-sections -fdata-sections" CACHE STRING "Optimization related flags")
-set(Wxx "-Wall -pedantic" CACHE STRING "Warning Feedback related flags")
+set(CPU "-mcpu=cortex-m4")
+set(FPU "-mfpu=fpv4-sp-d16 -mfloat-abi=hard")
+set(Oxx "-Os -ffunction-sections -fdata-sections")
+set(Wxx "-Wall -pedantic")
 
-set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} -mthumb ${CPU} ${FPU} -MD" CACHE STRING "" FORCE)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mthumb ${CPU} ${FPU} -std=gnu99 ${Oxx} -MD ${Wxx} " CACHE STRING "" FORCE)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mthumb ${CPU} ${FPU} ${Oxx} -MD ${Wxx} -fno-exceptions -fno-rtti" CACHE STRING "" FORCE)
+set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} -mthumb ${CPU} ${FPU} -MD")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mthumb ${CPU} ${FPU} -std=gnu99 ${Oxx} -MD ${Wxx} ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mthumb ${CPU} ${FPU} ${Oxx} -MD ${Wxx} -fno-exceptions -fno-rtti")
 
 # Generate Map File
 set(CMAKE_C_LINK_FLAGS "${CMAKE_C_LINK_FLAGS} -Wl,-Map,${CMAKE_PROJECT_NAME}.map")
