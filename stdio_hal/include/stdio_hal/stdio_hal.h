@@ -27,7 +27,11 @@ void 	stdio_put(const char* s, size_t len);
  * @brief	Print null-terminated string via stdio
  *			Blocks until all characters are successfully transfered to the H/W peripheral
  * @param 	s null-terminated string to transmit
+ * @return	Amount of bytes written into stdio until a null-terminator was met
  * @note	will automatically translate /n into /r/n
+ * @warning	This is a potential porting issue. 
+ * 			Current shell implemation relies on the return value of this function so it 
+ * 			doesn't need to both print to stdio and find length via strlen()
  */
 size_t 	stdio_print(const char* s);
 
